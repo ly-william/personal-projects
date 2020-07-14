@@ -128,13 +128,57 @@ def handle_click(x, y):
         prepare_draw(row, column, "O")
         x_turn = True
 
-    if checkWin():
+    is_won, points = check_win()
+
+    if is_won:
         win = True
+        draw_win_line(points)
 
     is_drawing = False
 
 
-def checkWin():
+def draw_win_line(points):
+    # print(f"{points[0]} {points[1]}")
+    direction = points[1]
+    padding = 20
+
+    # Vertical wins
+    if direction == "vertical":
+        first_column = TOP_LEFT_X + points[0][1] * BOX_WIDTH + BOX_WIDTH // 2
+        first_row = TOP_LEFT_Y - padding
+        second_column = first_column
+        second_row = -first_row
+
+    # Horizontal wins
+    if direction == "horizontal":
+        first_column = TOP_LEFT_X + padding
+        first_row = TOP_LEFT_Y - (points[0][0] * BOX_HEIGHT + BOX_HEIGHT // 2)
+        second_column = -first_column
+        second_row = first_row
+
+    # Top-left to bottom-right wins
+    if direction == "top-bottom":
+        first_column = TOP_LEFT_X + padding
+        first_row = TOP_LEFT_Y - padding
+        second_column = -first_column
+        second_row = -first_row
+
+    # Bottom-left to top-right wins
+    if direction == "bottom-top":
+        first_column = TOP_LEFT_X + padding
+        first_row = -TOP_LEFT_Y + padding
+        second_column = -TOP_LEFT_X - padding
+        second_row = TOP_LEFT_Y - padding
+
+    turtle.up()
+    turtle.goto(first_column, first_row)
+    turtle.down()
+    turtle.color("red")
+    turtle.goto(second_column, second_row)
+    turtle.hideturtle()
+
+
+def check_win():
     # Check horizontal wins
     for row in range(3):
         first_char = array_2d[row][0]
@@ -146,7 +190,8 @@ def checkWin():
                 break
 
             if column == 2:
-                return True
+                points = [(row, 0), "horizontal"]
+                return True, points
 
     # Check vertical wins
     for column in range(3):
@@ -159,7 +204,8 @@ def checkWin():
                 break
 
             if row == 2:
-                return True
+                points = [(0, column), "vertical"]
+                return True, points
 
     # Check diagonal (top-left to bottom-right)
     for i in range(3):
@@ -170,7 +216,7 @@ def checkWin():
         if first_char != compare:
             break
         if i == 2:
-            return True
+            return True, [(0, 0), "top-bottom"]
 
     # Check diagonal (bottom-left to top-right)
     for i in range(3):
@@ -181,9 +227,9 @@ def checkWin():
         if first_char != compare:
             break
         if i == 2:
-            return True
+            return True, [(2, 0), "bottom-top"]
 
-    return False
+    return False, []
 
 
 def get_array_index(x, y):
@@ -218,10 +264,12 @@ def draw_borders():
         turtle.left(90)
 
 
+turtle.speed(15)
 draw_column_lines()
 draw_row_lines()
 draw_borders()
 turtle.pensize(10)
+turtle.speed(10)
 screen.onclick(handle_click)
 
 # Keeps the window open
