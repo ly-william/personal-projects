@@ -3,7 +3,6 @@ import turtle
 turtle = turtle.Turtle()
 screen = turtle.getscreen()
 screen.title("Tic-tac-toe")
-turtle.pensize(12)
 
 SCREEN_WIDTH = screen.window_width()
 SCREEN_HEIGHT = screen.window_height()
@@ -29,12 +28,36 @@ win = False
 is_drawing = False
 
 
+def letterX(t, length):
+
+    half_length = length / 2
+    hypotenuse = (2 * half_length ** 2) ** 0.5
+
+    t.pendown()
+    t.right(45)
+    t.forward(half_length)
+    t.left(135)
+
+    t.penup()
+    t.forward(hypotenuse)
+    t.pendown()
+
+    t.left(135)
+    t.forward(length)
+    t.right(135)
+
+    t.penup()
+    t.forward(hypotenuse)
+    t.pendown()
+
+    t.right(135)
+    t.forward(half_length)
+    t.left(45)
+    t.penup()
+
+
 def draw_X():
-    for angle in range(-135, 136, 90):
-        mock = turtle.clone()
-        mock.left(angle)
-        mock.forward(100 / 2)
-        mock.hideturtle()
+    letterX(turtle, 100)
 
 
 def draw_O():
@@ -43,6 +66,10 @@ def draw_O():
     turtle.down()
     turtle.right(90)
     turtle.circle(45)
+
+
+def draw_play_again():
+    turtle.up()
 
 
 # This function draws the column lines
@@ -91,10 +118,7 @@ def prepare_draw(row, column, character):
 
 
 def handle_click(x, y):
-    global win
     global is_drawing
-    if win:
-        return
 
     if is_drawing:
         return
@@ -133,8 +157,17 @@ def handle_click(x, y):
     if is_won:
         win = True
         draw_win_line(points)
+        draw_play_again()
+        screen.onclick(handle_reset_game_click)
 
     is_drawing = False
+
+
+def handle_reset_game_click(foo, bar):
+    # Clear screen
+    turtle.reset()
+    # Starts game again
+    start_game()
 
 
 def draw_win_line(points):
@@ -264,13 +297,27 @@ def draw_borders():
         turtle.left(90)
 
 
-turtle.speed(15)
-draw_column_lines()
-draw_row_lines()
-draw_borders()
-turtle.pensize(10)
-turtle.speed(10)
-screen.onclick(handle_click)
+def start_game():
+    global x_turn
+    x_turn = True
+    turtle.pencolor("black")
+    turtle.pensize(12)
+    turtle.speed(15)
+    global array_2d
+    array_2d = [
+        ["-", "-", "-"],
+        ["-", "-", "-"],
+        ["-", "-", "-"],
+    ]
+    draw_column_lines()
+    draw_row_lines()
+    draw_borders()
+    turtle.pensize(10)
+    turtle.speed(10)
+    screen.onclick(handle_click)
+
+
+start_game()
 
 # Keeps the window open
 screen.mainloop()
