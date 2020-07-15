@@ -155,12 +155,23 @@ def handle_click(x, y):
     is_won, points = check_win()
 
     if is_won:
-        win = True
         draw_win_line(points)
         draw_play_again()
         screen.onclick(handle_reset_game_click)
 
+    if check_tie():
+        draw_play_again()
+        screen.onclick(handle_reset_game_click)
+
     is_drawing = False
+
+
+def check_tie():
+    for row in range(3):
+        for column in range(3):
+            if array_2d[row][column] == "-":
+                return False
+    return True
 
 
 def handle_reset_game_click(foo, bar):
